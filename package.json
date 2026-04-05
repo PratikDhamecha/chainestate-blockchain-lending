@@ -1,0 +1,19 @@
+{
+  "name": "chainestate",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "dev": "concurrently \"npm run server\" \"npm run client\"",
+    "server": "cd backend && npm run dev",
+    "client": "cd frontend && npm start",
+    "install:all": "npm install && cd frontend && npm install && cd ../backend && npm install"
+  },
+  "devDependencies": {
+    "@nomicfoundation/hardhat-toolbox": "^6.1.2",
+    "concurrently": "^8.2.0",
+    "hardhat": "^2.19.5"
+  },
+  "dependencies": {
+    "@openzeppelin/contracts": "^4.9.6"
+  }
+}

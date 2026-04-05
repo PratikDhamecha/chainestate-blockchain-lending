@@ -1,0 +1,174 @@
+/* ── CSS Variables ────────────────────────────────────────────────────────── */
+:root {
+  --bg-base: #04070f;
+  --bg-surface: rgba(6, 14, 32, 0.9);
+  --bg-elevated: rgba(8, 18, 40, 0.8);
+  --bg-card: rgba(6, 14, 32, 0.92);
+
+  --border: rgba(0, 180, 255, 0.12);
+  --border-hover: rgba(0, 200, 255, 0.3);
+  --border-focus: rgba(0, 200, 255, 0.5);
+
+  --accent: #00c8ff;
+  --accent-dim: rgba(0, 200, 255, 0.08);
+  --accent-glow: rgba(0, 200, 255, 0.25);
+
+  --text-primary: #e8f4ff;
+  --text-body: #b8cfe8;
+  --text-muted: rgba(184, 207, 232, 0.45);
+  --text-faint: rgba(184, 207, 232, 0.25);
+
+  --green: #4ade80;
+  --blue: #60a5fa;
+  --yellow: #facc15;
+  --red: #f87171;
+  --gray: #94a3b8;
+
+  --sidebar-w: 236px;
+  --topbar-h: 62px;
+
+  --font-display: "Orbitron", monospace;
+  --font-mono: "Space Mono", monospace;
+  --font-body: "Syne", sans-serif;
+
+  --radius-sm: 6px;
+  --radius-md: 10px;
+  --radius-lg: 14px;
+  --shadow-card: 0 4px 24px rgba(0, 0, 0, 0.4);
+  --shadow-glow: 0 0 20px rgba(0, 200, 255, 0.15);
+}
+
+/* ── Reset ────────────────────────────────────────────────────────────────── */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html,
+body,
+#root {
+  height: 100%;
+}
+
+body {
+  font-family: var(--font-body);
+  background: var(--bg-base);
+  color: var(--text-body);
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ── Scrollbar ────────────────────────────────────────────────────────────── */
+::-webkit-scrollbar {
+  width: 5px;
+  height: 5px;
+}
+::-webkit-scrollbar-track {
+  background: #080f1e;
+}
+::-webkit-scrollbar-thumb {
+  background: #1a3050;
+  border-radius: 3px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #1e4070;
+}
+
+/* ── Utility ──────────────────────────────────────────────────────────────── */
+.mono {
+  font-family: var(--font-mono);
+}
+.display {
+  font-family: var(--font-display);
+}
+.text-accent {
+  color: var(--accent);
+}
+.text-green {
+  color: var(--green);
+}
+.text-red {
+  color: var(--red);
+}
+.text-yellow {
+  color: var(--yellow);
+}
+.text-muted {
+  color: var(--text-muted);
+}
+.text-primary {
+  color: var(--text-primary);
+}
+
+/* ── Animations ───────────────────────────────────────────────────────────── */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+@keyframes toastIn {
+  from {
+    transform: translateX(110%);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+@keyframes pulseGlow {
+  0%,
+  100% {
+    box-shadow: 0 0 8px var(--accent-glow);
+  }
+  50% {
+    box-shadow: 0 0 20px var(--accent-glow), 0 0 40px rgba(0, 200, 255, 0.1);
+  }
+}
+
+.fade-in {
+  animation: fadeIn 0.3s ease both;
+}
+
+/* ── Grid background ─────────────────────────────────────────────────────── */
+.grid-bg::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  background-image: linear-gradient(
+      rgba(0, 180, 255, 0.035) 1px,
+      transparent 1px
+    ),
+    linear-gradient(90deg, rgba(0, 180, 255, 0.035) 1px, transparent 1px);
+  background-size: 44px 44px;
+  pointer-events: none;
+  z-index: 0;
+}
+.grid-bg::after {
+  content: "";
+  position: fixed;
+  top: -200px;
+  right: -200px;
+  width: 700px;
+  height: 700px;
+  background: radial-gradient(
+    circle,
+    rgba(0, 140, 255, 0.07) 0%,
+    transparent 65%
+  );
+  pointer-events: none;
+  z-index: 0;
+}
