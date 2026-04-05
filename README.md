@@ -1,9 +1,5 @@
 # ChainEstate — Blockchain Property Loan DApp
 
-Full-stack DApp for collateralized property loans using ERC-1155 fractional shares.
-
-# ChainEstate — Blockchain Property Loan DApp
-
 A decentralized application (DApp) that enables users to tokenize real estate into **ERC-1155 fractional shares** and use them as collateral to secure loans — eliminating the need for traditional banks and intermediaries.
 
 **Project Status:** Work In Progress (actively being developed)
