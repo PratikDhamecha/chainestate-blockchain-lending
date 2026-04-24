@@ -9,6 +9,7 @@ const loanRoutes     = require("./routes/loans");
 const propertyRoutes = require("./routes/properties");
 const txRoutes       = require("./routes/transactions");
 const kycRoutes      = require("./routes/kyc");
+const lenderRoutes   = require("./routes/lenders");
 
 const app = express();
 
@@ -25,6 +26,7 @@ app.use("/api/loans",        loanRoutes);
 app.use("/api/properties",   propertyRoutes);
 app.use("/api/transactions", txRoutes);
 app.use("/api/kyc",          kycRoutes);
+app.use("/api/lenders",      lenderRoutes);
 
 app.get("/api/health", (req, res) => res.json({ status: "ok", timestamp: new Date().toISOString() }));
 
@@ -35,11 +37,14 @@ app.use((err, req, res, next) => {
 });
 
 // ── DB + Start ────────────────────────────────────────────────────────────────
+const { startIndexer } = require("./services/indexer");
 const PORT = process.env.PORT || 5000;
+
 mongoose
   .connect(process.env.MONGODB_URI)
   .then(() => {
     console.log("✅ MongoDB connected");
+    startIndexer(); // Start listening to blockchain events
     app.listen(PORT, () => console.log(`🚀 Server running on http://localhost:${PORT}`));
   })
   .catch((err) => { console.error("❌ MongoDB error:", err.message); process.exit(1); });

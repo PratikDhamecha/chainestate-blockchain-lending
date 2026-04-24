@@ -2,16 +2,21 @@ import { ethers } from "ethers";
 
 export const LOAN_ABI = [
   "function loanCounter() view returns (uint256)",
-  "function loans(uint256) view returns (address,address,uint256,uint256,uint256,uint256,uint256,uint256,uint256,uint256,uint256,uint256,bool,bool)",
-  "function requestLoan(uint256 propertyId, uint256 sharesToLock, uint256 principal, uint256 interest, uint256 emiCount, uint256 durationPerEMI) external",
+  "function loans(uint256) view returns (address borrower, uint256 principal, uint256 remainingPrincipal, uint256 monthlyInterestRateBP, uint256 emiAmount, uint256 amountFunded, uint256 deadline, uint8 status)",
+  "function lenderAmounts(uint256, address) view returns (uint256)",
+  "function accumulatedRepayments(uint256) view returns (uint256)",
+  "function alreadyClaimed(uint256, address) view returns (uint256)",
+  "function createLoan(uint256 _principal, uint256 _monthlyRateBP, uint256 _duration, uint256 _emiAmount) external",
   "function fundLoan(uint256 loanId) external payable",
   "function payEMI(uint256 loanId) external payable",
-  "function seizeShares(uint256 loanId) external",
-  "event LoanRequested(uint256 indexed loanId, address indexed borrower)",
-  "event LoanFunded(uint256 indexed loanId, address indexed lender)",
-  "event EMIPaid(uint256 indexed loanId)",
-  "event SharesSeized(uint256 indexed loanId, uint256 shares)",
-  "event LoanClosed(uint256 indexed loanId)",
+  "function claimRepayment(uint256 loanId) external",
+  "function markDefault(uint256 loanId) external",
+  "event LoanCreated(uint256 indexed loanId, address indexed borrower, uint256 principal)",
+  "event LoanFunded(uint256 indexed loanId, address indexed lender, uint256 amount)",
+  "event LoanActivated(uint256 indexed loanId)",
+  "event EMIPaid(uint256 indexed loanId, uint256 totalPaid, uint256 principalReduction, uint256 interestPaid)",
+  "event RepaymentClaimed(uint256 indexed loanId, address indexed lender, uint256 amount)",
+  "event LoanDefaulted(uint256 indexed loanId)"
 ];
 
 export const PROPERTY_ABI = [
@@ -32,70 +37,73 @@ export async function getSigner() {
 
 // ── Contract instances -------
 export function getLoanContract(signerOrProvider) {
+  const address = process.env.REACT_APP_LOAN_CONTRACT_ADDRESS;
+  if (!address) throw new Error("REACT_APP_LOAN_CONTRACT_ADDRESS is missing");
   return new ethers.Contract(
-    process.env.REACT_APP_LOAN_CONTRACT_ADDRESS,
+    address,
     LOAN_ABI,
     signerOrProvider
   );
 }
 
 export function getPropertyContract(signerOrProvider) {
+  const address = process.env.REACT_APP_PROPERTY_CONTRACT_ADDRESS;
+  if (!address) throw new Error("REACT_APP_PROPERTY_CONTRACT_ADDRESS is missing");
   return new ethers.Contract(
-    process.env.REACT_APP_PROPERTY_CONTRACT_ADDRESS,
+    address,
     PROPERTY_ABI,
     signerOrProvider
   );
 }
 
-// ── requestLoan ───────────────────────────────────────────────────────────────
-export async function txRequestLoan({ propertyId, sharesToLock, principal, interest, emiCount, durationPerEMI }) {
+// ── createLoan ───────────────────────────────────────────────────────────────
+export async function txCreateLoan({ principal, monthlyRateBP, duration, emiAmount }) {
   const signer = await getSigner();
-  const loan   = getLoanContract(signer);
-  const prop   = getPropertyContract(signer);
+  const loan = getLoanContract(signer);
 
-  // 1. Approve shares
-  const isApproved = await prop.isApprovedForAll(await signer.getAddress(), process.env.REACT_APP_LOAN_CONTRACT_ADDRESS);
-  if (!isApproved) {
-    const approveTx = await prop.setApprovalForAll(process.env.REACT_APP_LOAN_CONTRACT_ADDRESS, true);
-    await approveTx.wait();
-  }
-
-  // 2. Request loan
-  const tx = await loan.requestLoan(
-    propertyId,
-    sharesToLock,
-    ethers.parseEther(principal),
-    ethers.parseEther(interest),
-    emiCount,
-    durationPerEMI
+  // Request loan in LendingCore
+  const tx = await loan.createLoan(
+    ethers.parseEther(principal.toString()),
+    monthlyRateBP,
+    duration,
+    ethers.parseEther(emiAmount.toString())
   );
   const receipt = await tx.wait();
   return { txHash: receipt.hash };
 }
 
 // ── fundLoan ──────────────────────────────────────────────────────────────────
-export async function txFundLoan(loanId, principalEth) {
+export async function txFundLoan(loanId, contributionEth) {
   const signer = await getSigner();
-  const loan   = getLoanContract(signer);
-  const tx     = await loan.fundLoan(loanId, { value: ethers.parseEther(principalEth) });
+  const loan = getLoanContract(signer);
+  const tx = await loan.fundLoan(loanId, { value: ethers.parseEther(contributionEth) });
   const receipt = await tx.wait();
   return { txHash: receipt.hash };
 }
 
 // ── payEMI ────────────────────────────────────────────────────────────────────
-export async function txPayEMI(loanId, emiAmountWei) {
+export async function txPayEMI(loanId, paymentEth) {
   const signer = await getSigner();
-  const loan   = getLoanContract(signer);
-  const tx     = await loan.payEMI(loanId, { value: emiAmountWei });
+  const loan = getLoanContract(signer);
+  const tx = await loan.payEMI(loanId, { value: ethers.parseEther(paymentEth.toString()) });
   const receipt = await tx.wait();
   return { txHash: receipt.hash };
 }
 
-// ── seizeShares ───────────────────────────────────────────────────────────────
-export async function txSeizeShares(loanId) {
+// ── claimRepayment ───────────────────────────────────────────────────────────────
+export async function txClaimRepayment(loanId) {
   const signer = await getSigner();
-  const loan   = getLoanContract(signer);
-  const tx     = await loan.seizeShares(loanId);
+  const loan = getLoanContract(signer);
+  const tx = await loan.claimRepayment(loanId);
+  const receipt = await tx.wait();
+  return { txHash: receipt.hash };
+}
+
+// ── markDefault ───────────────────────────────────────────────────────────────
+export async function txMarkDefault(loanId) {
+  const signer = await getSigner();
+  const loan = getLoanContract(signer);
+  const tx = await loan.markDefault(loanId);
   const receipt = await tx.wait();
   return { txHash: receipt.hash };
 }
@@ -103,8 +111,8 @@ export async function txSeizeShares(loanId) {
 // ── mintProperty ─────────────────────────────────────────────────────────────
 export async function txMintProperty(ownerAddress, shares) {
   const signer = await getSigner();
-  const prop   = getPropertyContract(signer);
-  const tx     = await prop.mintProperty(ownerAddress, shares);
+  const prop = getPropertyContract(signer);
+  const tx = await prop.mintProperty(ownerAddress, shares);
   const receipt = await tx.wait();
   return { txHash: receipt.hash };
 }

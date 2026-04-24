@@ -8,9 +8,9 @@ const FILTERS = ["ALL", "REQUESTED", "ACTIVE", "FUNDED", "CLOSED", "DEFAULTED"];
 
 export default function LoansPage() {
   const [filter, setFilter] = useState("ALL");
-  const [loans,  setLoans]  = useState([]);
-  const [loading,setLoad]   = useState(true);
-  const [sel,    setSel]    = useState(null);
+  const [loans, setLoans] = useState([]);
+  const [loading, setLoad] = useState(true);
+  const [sel, setSel] = useState(null);
 
   const load = useCallback(async () => {
     setLoad(true);
@@ -40,7 +40,7 @@ export default function LoansPage() {
       <div className="table-wrap">
         <div className="table-head loans-cols">
           <span>ID</span><span>BORROWER</span><span>LENDER</span>
-          <span>PRINCIPAL</span><span>EMIs</span><span>STATUS</span>
+          <span>PRINCIPAL</span><span>REMAINING</span><span>STATUS</span>
           <span>NEXT DUE</span><span>INSPECT</span>
         </div>
         {loading && <div className="page-loader"><div className="spinner" />Loading loans…</div>}
@@ -53,10 +53,10 @@ export default function LoansPage() {
             <span className="cell-addr">{shortAddr(l.borrower)}</span>
             <span className="cell-addr">{l.lender ? shortAddr(l.lender) : <span style={{ color: "var(--yellow)" }}>Awaiting…</span>}</span>
             <span className="cell-mono">{fmtEth(l.principal)}</span>
-            <span className="cell-mono">{l.emiPaid}/{l.emiCount}</span>
+            <span className="cell-mono" style={{ color: "var(--red)" }}>{fmtEth(l.remainingPrincipal || l.principal)}</span>
             <Badge status={l.status} />
             <span className={l.status === "DEFAULTED" ? "cell-due-miss" : "cell-mono"}>
-              {l.nextDueDate ? new Date(l.nextDueDate).toLocaleDateString() : "N/A"}
+              {l.deadline ? new Date(l.deadline).toLocaleDateString() : "N/A"}
             </span>
             <button className="btn btn-outline btn-sm" onClick={(e) => { e.stopPropagation(); setSel(l); }}>
               Inspect

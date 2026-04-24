@@ -180,22 +180,22 @@
 }
 
 .btn-primary {
-  background: linear-gradient(135deg, #0055bb, #0099ee);
+  background: var(--accent);
   color: #fff;
-  box-shadow: 0 4px 18px rgba(0, 140, 255, 0.28);
+  box-shadow: 0 4px 18px var(--accent-glow);
 }
 .btn-primary:hover:not(:disabled) {
-  box-shadow: 0 6px 28px rgba(0, 140, 255, 0.45);
+  box-shadow: 0 6px 28px rgba(0, 107, 223, 0.45);
   transform: translateY(-1px);
 }
 .btn-outline {
   background: transparent;
   color: var(--accent);
-  border: 1px solid rgba(0, 200, 255, 0.28);
+  border: 1px solid var(--border);
 }
 .btn-outline:hover:not(:disabled) {
   background: var(--accent-dim);
-  border-color: rgba(0, 200, 255, 0.55);
+  border-color: var(--border-hover);
 }
 .btn-danger {
   background: rgba(239, 68, 68, 0.1);
@@ -504,7 +504,7 @@
   color: rgba(0, 200, 255, 0.6);
 }
 .emi-bar-bg {
-  background: rgba(0, 180, 255, 0.08);
+  background: var(--accent-dim);
   border-radius: 4px;
   height: 6px;
   overflow: hidden;
@@ -512,8 +512,8 @@
 .emi-bar-fill {
   height: 100%;
   border-radius: 4px;
-  background: linear-gradient(90deg, #0055bb, #00c8ff);
-  box-shadow: 0 0 10px rgba(0, 200, 255, 0.35);
+  background: var(--accent);
+  box-shadow: 0 0 10px var(--accent-glow);
   transition: width 0.6s ease;
 }
 
@@ -775,4 +775,148 @@
   grid-template-columns: repeat(4, 1fr);
   gap: 18px;
   margin-bottom: 28px;
+}
+
+/* ── Custom Component Styles ─────────────────────────────────────────────── */
+.borrow-grid {
+  display: grid;
+  grid-template-columns: 1.4fr 1fr;
+  gap: 24px;
+}
+
+.lend-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+}
+
+.lend-card-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr 2fr;
+  gap: 16px;
+  margin-bottom: 20px;
+}
+
+/* ── Responsive Media Queries ────────────────────────────────────────────── */
+@media (max-width: 900px) {
+  .borrow-grid {
+    grid-template-columns: 1fr;
+  }
+  .lend-card-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+  .lend-card-grid > div:nth-child(3) {
+    grid-column: span 2;
+  }
+  .stats-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+@media (max-width: 768px) {
+  .sidebar {
+    width: 60px;
+  }
+  .main-content {
+    margin-left: 60px;
+  }
+  .topbar {
+    left: 60px;
+  }
+  .sidebar-logo .logo-title, 
+  .sidebar-logo .logo-sub,
+  .nav-item span,
+  .nav-group-label {
+    display: none;
+  }
+  .table-head, .table-row {
+    font-size: 10px;
+  }
+  .loans-cols {
+    grid-template-columns: 0.5fr 1fr 1fr 1fr 1fr;
+  }
+  .loans-cols > span:nth-child(5),
+  .loans-cols > span:nth-child(6),
+  .loans-cols > span:nth-child(7) {
+    display: none;
+  }
+}
+
+@media (max-width: 500px) {
+  .stats-grid {
+    grid-template-columns: 1fr;
+  }
+  .form-grid {
+    grid-template-columns: 1fr;
+  }
+  .form-group.half {
+    grid-column: 1 / -1;
+  }
+}
+
+
+.lend-action-row {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  border-top: 1px solid var(--border);
+  padding-top: 16px;
+}
+
+/* ── Responsive Media Queries ────────────────────────────────────────────── */
+@media (max-width: 1024px) {
+  .stats-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  .borrow-grid {
+    grid-template-columns: 1fr;
+  }
+  .lend-card-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+  .lend-card-grid > div:nth-child(3) {
+    grid-column: span 2;
+  }
+  .table-wrap {
+    overflow-x: auto;
+  }
+}
+
+@media (max-width: 768px) {
+  :root {
+    --sidebar-w: 0px;
+  }
+  .sidebar {
+    transform: translateX(-100%);
+  }
+  .topbar {
+    left: 0;
+    padding: 0 16px;
+  }
+  .main-content {
+    margin-left: 0;
+  }
+  .page-body {
+    padding: 20px 16px;
+  }
+  .form-grid {
+    grid-template-columns: 1fr;
+  }
+  .stats-grid {
+    grid-template-columns: 1fr;
+  }
+  .loans-cols, .tx-cols {
+    min-width: 800px; /* Force scroll */
+  }
+  .lend-action-row {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  .lend-card-grid {
+    grid-template-columns: 1fr;
+  }
+  .lend-card-grid > div:nth-child(3) {
+    grid-column: span 1;
+  }
 }

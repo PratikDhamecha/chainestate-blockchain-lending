@@ -3,21 +3,22 @@ import { useNavigate } from "react-router-dom";
 import Badge from "../components/common/Badge";
 import { loansApi, txApi } from "../services/api";
 import { shortAddr, fmtEth } from "../services/contracts";
+import { ethers } from "ethers";
 
 const EVENT_COLOR = {
   LoanRequested: "var(--yellow)",
-  LoanFunded:    "var(--blue)",
-  EMIPaid:       "var(--green)",
-  SharesSeized:  "var(--red)",
-  LoanClosed:    "var(--gray)",
+  LoanFunded: "var(--blue)",
+  EMIPaid: "var(--green)",
+  SharesSeized: "var(--red)",
+  LoanClosed: "var(--gray)",
 };
 
 export default function Dashboard() {
   const nav = useNavigate();
-  const [stats,  setStats]  = useState(null);
-  const [loans,  setLoans]  = useState([]);
-  const [txs,    setTxs]    = useState([]);
-  const [loading,setLoading]= useState(true);
+  const [stats, setStats] = useState(null);
+  const [loans, setLoans] = useState([]);
+  const [txs, setTxs] = useState([]);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     async function load() {
@@ -44,9 +45,9 @@ export default function Dashboard() {
 
   const statCards = [
     { icon: "🔒", label: "TOTAL VALUE LOCKED", value: stats ? `${parseFloat(stats.tvlEth).toFixed(2)} ETH` : "—", sub: "Active + Funded loans" },
-    { icon: "📋", label: "ACTIVE LOANS",       value: stats?.active   ?? "—", sub: "Funded & in repayment" },
-    { icon: "⏳", label: "OPEN REQUESTS",      value: stats?.requested ?? "—", sub: "Awaiting lenders" },
-    { icon: "🛡️", label: "DEFAULT RATE",       value: stats?.total > 0 ? `${((stats.defaulted / stats.total) * 100).toFixed(1)}%` : "0%", sub: "Across all loans" },
+    { icon: "📋", label: "ACTIVE LOANS", value: stats?.active ?? "—", sub: "Funded & in repayment" },
+    { icon: "⏳", label: "OPEN REQUESTS", value: stats?.requested ?? "—", sub: "Awaiting lenders" },
+    { icon: "🛡️", label: "DEFAULT RATE", value: stats?.total > 0 ? `${((stats.defaulted / stats.total) * 100).toFixed(1)}%` : "0%", sub: "Across all loans" },
   ];
 
   return (
@@ -71,27 +72,31 @@ export default function Dashboard() {
       </div>
 
       <div className="table-wrap" style={{ marginBottom: 28 }}>
-        <div className="table-head loans-cols">
-          <span>ID</span><span>BORROWER</span><span>PROPERTY</span>
-          <span>PRINCIPAL</span><span>EMIs</span><span>STATUS</span>
-          <span>DUE DATE</span><span>ACTION</span>
+        <div className="table-head loans-cols" style={{ gridTemplateColumns: '0.5fr 1.2fr 1fr 1fr 0.8fr 0.9fr 0.85fr' }}>
+          <span>ID</span><span>BORROWER</span>
+          <span>PRINCIPAL</span><span>FUNDED</span><span>STATUS</span>
+          <span>DEADLINE</span><span>ACTION</span>
         </div>
         {loading && <div className="page-loader"><div className="spinner" />Loading…</div>}
         {!loading && loans.length === 0 && <div className="empty-state">No loans yet. Be the first to request one!</div>}
-        {loans.map((l) => (
-          <div key={l._id} className="table-row loans-cols">
-            <span className="cell-id">#{l.loanId}</span>
-            <span className="cell-addr">{shortAddr(l.borrower)}</span>
-            <span className="cell-mono">Prop #{l.propertyId}</span>
-            <span className="cell-mono">{fmtEth(l.principal)}</span>
-            <span className="cell-mono">{l.emiPaid}/{l.emiCount}</span>
-            <Badge status={l.status} />
-            <span className={l.status === "DEFAULTED" ? "cell-due-miss" : "cell-mono"}>
-              {l.nextDueDate ? new Date(l.nextDueDate).toLocaleDateString() : "N/A"}
-            </span>
-            <button className="btn btn-outline btn-sm" onClick={() => nav("/loans")}>View</button>
-          </div>
-        ))}
+        {loans.map((l) => {
+          const principal = parseFloat(ethers.formatEther(l.principal || "0"));
+          const funded = parseFloat(ethers.formatEther(l.amountFunded || "0"));
+          const progress = principal > 0 ? ((funded / principal) * 100).toFixed(0) : 0;
+          return (
+            <div key={l._id} className="table-row loans-cols" style={{ gridTemplateColumns: '0.5fr 1.2fr 1fr 1fr 0.8fr 0.9fr 0.85fr' }}>
+              <span className="cell-id">#{l.loanId}</span>
+              <span className="cell-addr">{shortAddr(l.borrower)}</span>
+              <span className="cell-mono">{fmtEth(l.principal)}</span>
+              <span className="cell-mono" style={{ color: 'var(--green)' }}>{progress}% ({fmtEth(l.amountFunded || "0")})</span>
+              <Badge status={l.status} />
+              <span className={l.status === "DEFAULTED" ? "cell-due-miss" : "cell-mono"}>
+                {l.deadline ? new Date(l.deadline).toLocaleDateString() : "N/A"}
+              </span>
+              <button className="btn btn-outline btn-sm" onClick={() => nav("/loans")}>View</button>
+            </div>
+          );
+        })}
       </div>
 
       {/* Live events */}

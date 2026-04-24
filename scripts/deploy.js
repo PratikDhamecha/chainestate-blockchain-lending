@@ -18,17 +18,17 @@ async function main() {
   const kycAddress = await kycRegistry.getAddress();
   console.log("KYCRegistry deployed to:", kycAddress);
 
-  // 3. Deploy LoanContract (now takes KYC address too)
-  const LoanContract = await hre.ethers.getContractFactory("LoanContract");
-  const loanContract = await LoanContract.deploy(propertyAddress, kycAddress);
-  await loanContract.waitForDeployment();
-  const loanAddress = await loanContract.getAddress();
-  console.log("LoanContract deployed to:", loanAddress);
+  // 3. Deploy LendingCore (Syndicated Multi-Lender Protocol)
+  const LendingCore = await hre.ethers.getContractFactory("LendingCore");
+  const lendingCore = await LendingCore.deploy();
+  await lendingCore.waitForDeployment();
+  const lendingCoreAddress = await lendingCore.getAddress();
+  console.log("LendingCore deployed to:", lendingCoreAddress);
 
   console.log("\n── Copy these into your .env files ──────────────────────");
   console.log(`PROPERTY_CONTRACT_ADDRESS=${propertyAddress}`);
   console.log(`KYC_CONTRACT_ADDRESS=${kycAddress}`);
-  console.log(`LOAN_CONTRACT_ADDRESS=${loanAddress}`);
+  console.log(`LOAN_CONTRACT_ADDRESS=${lendingCoreAddress}`);
 }
 
 main().catch((error) => {

@@ -1,41 +1,41 @@
 /* ── CSS Variables ────────────────────────────────────────────────────────── */
 :root {
-  --bg-base: #04070f;
-  --bg-surface: rgba(6, 14, 32, 0.9);
-  --bg-elevated: rgba(8, 18, 40, 0.8);
-  --bg-card: rgba(6, 14, 32, 0.92);
+  --bg-base: #001229; /* Slightly darker than Navy for depth */
+  --bg-surface: #002147; /* Dark Navy */
+  --bg-elevated: #002b5e;
+  --bg-card: #002147;
 
-  --border: rgba(0, 180, 255, 0.12);
-  --border-hover: rgba(0, 200, 255, 0.3);
-  --border-focus: rgba(0, 200, 255, 0.5);
+  --border: rgba(0, 107, 223, 0.2);
+  --border-hover: rgba(0, 107, 223, 0.5);
+  --border-focus: rgba(0, 107, 223, 0.8);
 
-  --accent: #00c8ff;
-  --accent-dim: rgba(0, 200, 255, 0.08);
-  --accent-glow: rgba(0, 200, 255, 0.25);
+  --accent: #006BDF; /* Electric Blue */
+  --accent-dim: rgba(0, 107, 223, 0.15);
+  --accent-glow: rgba(0, 107, 223, 0.35);
 
-  --text-primary: #e8f4ff;
-  --text-body: #b8cfe8;
-  --text-muted: rgba(184, 207, 232, 0.45);
-  --text-faint: rgba(184, 207, 232, 0.25);
+  --text-primary: #FFFFFF; /* White */
+  --text-body: #A3A3A3; /* Cool Gray */
+  --text-muted: rgba(163, 163, 163, 0.7);
+  --text-faint: rgba(163, 163, 163, 0.4);
 
-  --green: #4ade80;
-  --blue: #60a5fa;
-  --yellow: #facc15;
-  --red: #f87171;
-  --gray: #94a3b8;
+  --green: #22c55e;
+  --blue: #006BDF;
+  --yellow: #eab308;
+  --red: #ef4444;
+  --gray: #A3A3A3;
 
   --sidebar-w: 236px;
   --topbar-h: 62px;
 
-  --font-display: "Orbitron", monospace;
-  --font-mono: "Space Mono", monospace;
-  --font-body: "Syne", sans-serif;
+  --font-display: "SF Pro Display", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  --font-mono: "SF Mono", "Space Mono", monospace;
+  --font-body: "SF Pro Display", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
 
   --radius-sm: 6px;
-  --radius-md: 10px;
-  --radius-lg: 14px;
-  --shadow-card: 0 4px 24px rgba(0, 0, 0, 0.4);
-  --shadow-glow: 0 0 20px rgba(0, 200, 255, 0.15);
+  --radius-md: 8px;
+  --radius-lg: 12px;
+  --shadow-card: 0 4px 16px rgba(0, 0, 0, 0.2);
+  --shadow-glow: 0 0 20px rgba(0, 107, 223, 0.2);
 }
 
 /* ── Reset ────────────────────────────────────────────────────────────────── */
